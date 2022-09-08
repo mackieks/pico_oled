@@ -1,4 +1,4 @@
-#include "ssd1331.h"
+#include "ssd1351.h"
 
 extern tFont Font;
 
@@ -830,22 +830,22 @@ void fast_hsv2rgb_32bit(uint16_t h, uint8_t s, uint8_t v, uint8_t *r, uint8_t *g
 	}
 }
 
-void ssd1331WriteCommand(const uint8_t data){
+void SSD1351WriteCommand(const uint8_t data){
   // gpio_put(DC, 0);
-  spi_write_blocking(SSD1331_SPI, &data, 1);
+  spi_write_blocking(SSD1351_SPI, &data, 1);
 }
 
-void ssd1331WriteCommands(const uint8_t* data, uint num){
-  spi_write_blocking(SSD1331_SPI, data, num);
+void SSD1351WriteCommands(const uint8_t* data, uint num){
+  spi_write_blocking(SSD1351_SPI, data, num);
 }
 
-void ssd1331WriteData(const uint8_t* data, uint numbytes){
+void SSD1351WriteData(const uint8_t* data, uint numbytes){
   // Write to register
   gpio_put(DC, 1);
-  spi_write_blocking(SSD1331_SPI, data, numbytes);
+  spi_write_blocking(SSD1351_SPI, data, numbytes);
 }
 
-void setPixelSSD1331(const uint8_t x, const uint8_t y, const uint16_t color){
+void setPixelSSD1351(const uint8_t x, const uint8_t y, const uint16_t color){
   // Set Pixel
   // uint8_t r = (color & 0xF800) >> 11;
   // uint8_t g = (color & 0x7E0) >> 5;
@@ -856,36 +856,36 @@ void setPixelSSD1331(const uint8_t x, const uint8_t y, const uint16_t color){
   memset(&oledFB[(y*192) + (x*2)], color >> 8, sizeof(uint8_t));
   memset(&oledFB[(y*192) + (x*2) + 1], color & 0xff, sizeof(uint8_t));
 
-  // ssd1331WriteCommand(0x21);
-  // ssd1331WriteCommand(x);
-  // ssd1331WriteCommand(x);
-  // ssd1331WriteCommand(y);
-  // ssd1331WriteCommand(y);
-  // ssd1331WriteCommand(r);
-  // ssd1331WriteCommand(g);
-  // ssd1331WriteCommand(b);
+  // SSD1351WriteCommand(0x21);
+  // SSD1351WriteCommand(x);
+  // SSD1351WriteCommand(x);
+  // SSD1351WriteCommand(y);
+  // SSD1351WriteCommand(y);
+  // SSD1351WriteCommand(r);
+  // SSD1351WriteCommand(g);
+  // SSD1351WriteCommand(b);
 }
 
-void updateSSD1331(void){
+void updateSSD1351(void){
   gpio_put(DC, 0);
 
-  ssd1331WriteCommand(0x15);
-  ssd1331WriteCommand(0);
-  ssd1331WriteCommand(95);
-  ssd1331WriteCommand(0x75);
-  ssd1331WriteCommand(0);
-  ssd1331WriteCommand(63);
+  SSD1351WriteCommand(0x15);
+  SSD1351WriteCommand(0);
+  SSD1351WriteCommand(95);
+  SSD1351WriteCommand(0x75);
+  SSD1351WriteCommand(0);
+  SSD1351WriteCommand(63);
 
   gpio_put(DC, 1);
 
   if(!(dma_channel_is_busy(dma_tx)))
     dma_channel_configure(dma_tx, &c,
-                          &spi_get_hw(SSD1331_SPI)->dr, // write address
+                          &spi_get_hw(SSD1351_SPI)->dr, // write address
                           oledFB, // read address
                           sizeof(oledFB), // element count (each element is of size transfer_data_size)
                           true); // start
 
-  //spi_write_blocking(SSD1331_SPI, oledFB, sizeof(oledFB));
+  //spi_write_blocking(SSD1351_SPI, oledFB, sizeof(oledFB));
 }
 
 void drawEllipse(int xc, int yc, int xr, int yr, int angle){
@@ -908,9 +908,9 @@ void drawEllipse(int xc, int yc, int xr, int yr, int angle){
     y = yc + yr * sin32(theta);
     xrot = round(xc + (x - xc) * cangle - (y - yc) * sangle);
     yrot = round(yc + (x - xc) * sangle + (y - yc) * cangle);
-    setPixelSSD1331(xrot, yrot, 0xffff);
+    setPixelSSD1351(xrot, yrot, 0xffff);
   }
-  //updateSSD1331();
+  //updateSSD1351();
 };
 
 void drawLine(int x0, int y0, int w, uint16_t color){
@@ -934,7 +934,7 @@ void hagl_draw_line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t col
     err = (dx > dy ? dx : -dy) / 2;
 
     while (1) {
-        setPixelSSD1331(x0, y0, color);
+        setPixelSSD1351(x0, y0, color);
 
         if (x0 == x1 && y0 == y1) {
             break;
@@ -992,18 +992,18 @@ int f = 1 - r;
 void drawCursor(int iy, uint16_t color){
   for(int i = 87; i <= 95; i++){
     for(int j = 0; j <= 63; j++){
-      setPixelSSD1331(i,j,0x00);
+      setPixelSSD1351(i,j,0x00);
     }
   }
   for(int i = 93; i >= 90; i--){
     for(int j = 57; j >= 53; j--){
       if(i > 90)
-        setPixelSSD1331(i, j - (12 * iy), color);
+        setPixelSSD1351(i, j - (12 * iy), color);
       else if ((j > 53) && (j < 57))
-        setPixelSSD1331(i, j - (12 * iy), color);
+        setPixelSSD1351(i, j - (12 * iy), color);
     }
   }
-  setPixelSSD1331(89, 55 - (12 * iy), color);
+  setPixelSSD1351(89, 55 - (12 * iy), color);
 }
 
 void drawToggle(int iy, uint16_t color, bool on){
@@ -1011,43 +1011,43 @@ void drawToggle(int iy, uint16_t color, bool on){
     for(int i = 20; i >= 3; i--){
       for(int j = 58; j >= 52; j--){
         if( !(( i >= 4 && i <= 8) && (j >= 53 && j <= 57)) )
-          setPixelSSD1331(i, j - (12 * iy), color);
+          setPixelSSD1351(i, j - (12 * iy), color);
       }
     }
-    setPixelSSD1331(20, 58 - (12 * iy), 0x0000);
-    setPixelSSD1331(20, 57 - (12 * iy), 0x0000);
-    setPixelSSD1331(20, 53 - (12 * iy), 0x0000);
-    setPixelSSD1331(20, 52 - (12 * iy), 0x0000);
-    setPixelSSD1331(19, 58 - (12 * iy), 0x0000);
-    setPixelSSD1331(19, 52 - (12 * iy), 0x0000);
+    setPixelSSD1351(20, 58 - (12 * iy), 0x0000);
+    setPixelSSD1351(20, 57 - (12 * iy), 0x0000);
+    setPixelSSD1351(20, 53 - (12 * iy), 0x0000);
+    setPixelSSD1351(20, 52 - (12 * iy), 0x0000);
+    setPixelSSD1351(19, 58 - (12 * iy), 0x0000);
+    setPixelSSD1351(19, 52 - (12 * iy), 0x0000);
 
-    setPixelSSD1331(3, 58 - (12 * iy), 0x0000);
-    setPixelSSD1331(3, 57 - (12 * iy), 0x0000);
-    setPixelSSD1331(3, 53 - (12 * iy), 0x0000);
-    setPixelSSD1331(3, 52 - (12 * iy), 0x0000);
-    setPixelSSD1331(4, 58 - (12 * iy), 0x0000);
-    setPixelSSD1331(4, 52 - (12 * iy), 0x0000);
+    setPixelSSD1351(3, 58 - (12 * iy), 0x0000);
+    setPixelSSD1351(3, 57 - (12 * iy), 0x0000);
+    setPixelSSD1351(3, 53 - (12 * iy), 0x0000);
+    setPixelSSD1351(3, 52 - (12 * iy), 0x0000);
+    setPixelSSD1351(4, 58 - (12 * iy), 0x0000);
+    setPixelSSD1351(4, 52 - (12 * iy), 0x0000);
 
-    setPixelSSD1331(4, 57 - (12 * iy), color);
-    setPixelSSD1331(8, 57 - (12 * iy), color);
-    setPixelSSD1331(8, 53 - (12 * iy), color);
-    setPixelSSD1331(4, 53 - (12 * iy), color);
+    setPixelSSD1351(4, 57 - (12 * iy), color);
+    setPixelSSD1351(8, 57 - (12 * iy), color);
+    setPixelSSD1351(8, 53 - (12 * iy), color);
+    setPixelSSD1351(4, 53 - (12 * iy), color);
   } else {
     for(int i = 18; i >= 5; i--){
-      setPixelSSD1331(i, 58 - (12 * iy), color);
-      setPixelSSD1331(i, 52 - (12 * iy), color);
+      setPixelSSD1351(i, 58 - (12 * iy), color);
+      setPixelSSD1351(i, 52 - (12 * iy), color);
     }
     for(int j = 56; j >= 54; j--){
-      setPixelSSD1331(3, j - (12 * iy), color);
-      setPixelSSD1331(14, j - (12 * iy), color);
-      setPixelSSD1331(20, j - (12 * iy), color);
+      setPixelSSD1351(3, j - (12 * iy), color);
+      setPixelSSD1351(14, j - (12 * iy), color);
+      setPixelSSD1351(20, j - (12 * iy), color);
     }
-    setPixelSSD1331(4, 57 - (12 * iy), color);
-    setPixelSSD1331(4, 53 - (12 * iy), color);
-    setPixelSSD1331(15, 57 - (12 * iy), color);
-    setPixelSSD1331(15, 53 - (12 * iy), color);
-    setPixelSSD1331(19, 57 - (12 * iy), color);
-    setPixelSSD1331(19, 53 - (12 * iy), color);
+    setPixelSSD1351(4, 57 - (12 * iy), color);
+    setPixelSSD1351(4, 53 - (12 * iy), color);
+    setPixelSSD1351(15, 57 - (12 * iy), color);
+    setPixelSSD1351(15, 53 - (12 * iy), color);
+    setPixelSSD1351(19, 57 - (12 * iy), color);
+    setPixelSSD1351(19, 53 - (12 * iy), color);
   }
 }
 
@@ -1060,9 +1060,9 @@ void putLetter(int ix, int iy, int index, uint16_t color){
   for(int i = 0; i <= 9; i++){
     for(int j = 2; j <= 7; j++){  // iterate through bits in row of character
       if( !((1 << j) & a[i]) )
-        setPixelSSD1331((88-(ix*6))-j,(59-(iy*10)-(iy*2))-i,color);
+        setPixelSSD1351((88-(ix*6))-j,(59-(iy*10)-(iy*2))-i,color);
       else
-        setPixelSSD1331((88-(ix*6))-j,(59-(iy*10)-(iy*2))-i,0x0000);
+        setPixelSSD1351((88-(ix*6))-j,(59-(iy*10)-(iy*2))-i,0x0000);
     }
   }
 }
@@ -1391,23 +1391,23 @@ void putString(char* text, int ix, int iy, uint16_t color){
 
 
 
-void clearSSD1331(void){
+void clearSSD1351(void){
   // gpio_put(DC, 0);
 
-  // ssd1331WriteCommand(0x15);
-  // ssd1331WriteCommand(0);
-  // ssd1331WriteCommand(95);
-  // ssd1331WriteCommand(0x75);
-  // ssd1331WriteCommand(0);
-  // ssd1331WriteCommand(63);
+  // SSD1351WriteCommand(0x15);
+  // SSD1351WriteCommand(0);
+  // SSD1351WriteCommand(95);
+  // SSD1351WriteCommand(0x75);
+  // SSD1351WriteCommand(0);
+  // SSD1351WriteCommand(63);
 
   // gpio_put(DC, 1);
   
   memset(oledFB, 0, sizeof(oledFB));
-  //spi_write_blocking(SSD1331_SPI, oledFB, sizeof(oledFB));
+  //spi_write_blocking(SSD1351_SPI, oledFB, sizeof(oledFB));
 }
 
-void ssd1331_init() {
+void SSD1351_init() {
   gpio_init(DC);
   gpio_set_dir(DC, GPIO_OUT);
   gpio_put(DC, 1);
@@ -1418,59 +1418,47 @@ void ssd1331_init() {
   gpio_put(RST, 1);
   gpio_put(DC, 0);
   // Initialization Sequence
-  ssd1331WriteCommand(SSD1331_CMD_DISPLAYOFF); // 0xAE
-  ssd1331WriteCommand(SSD1331_CMD_SETREMAP);   // 0xA0
-  if(OLED_FLIP) 
-    ssd1331WriteCommand(0x60); 
-  else
-    ssd1331WriteCommand(0x72);
-
-  ssd1331WriteCommand(SSD1331_CMD_STARTLINE); // 0xA1
-  ssd1331WriteCommand(0x0);
-  ssd1331WriteCommand(SSD1331_CMD_DISPLAYOFFSET); // 0xA2
-  ssd1331WriteCommand(0x0);
-  ssd1331WriteCommand(SSD1331_CMD_NORMALDISPLAY); // 0xA4
-  ssd1331WriteCommand(SSD1331_CMD_SETMULTIPLEX);  // 0xA8
-  ssd1331WriteCommand(0x3F);                      // 0x3F 1/64 duty
-  ssd1331WriteCommand(SSD1331_CMD_SETMASTER);     // 0xAD
-  ssd1331WriteCommand(0x8E);
-  ssd1331WriteCommand(SSD1331_CMD_POWERMODE); // 0xB0
-  ssd1331WriteCommand(0x0B);
-  ssd1331WriteCommand(SSD1331_CMD_PRECHARGE); // 0xB1
-  ssd1331WriteCommand(0x31);
-  ssd1331WriteCommand(SSD1331_CMD_CLOCKDIV); // 0xB3
-  ssd1331WriteCommand(0xF0); // 7:4 = Oscillator Frequency, 3:0 = CLK Div Ratio
-                     // (A[3:0]+1 = 1..16)
-  ssd1331WriteCommand(SSD1331_CMD_PRECHARGEA); // 0x8A
-  ssd1331WriteCommand(0x64);
-  ssd1331WriteCommand(SSD1331_CMD_PRECHARGEB); // 0x8B
-  ssd1331WriteCommand(0x78);
-  ssd1331WriteCommand(SSD1331_CMD_PRECHARGEC); // 0x8C
-  ssd1331WriteCommand(0x64);
-  ssd1331WriteCommand(SSD1331_CMD_PRECHARGELEVEL); // 0xBB
-  ssd1331WriteCommand(0x3A);
-  ssd1331WriteCommand(SSD1331_CMD_VCOMH); // 0xBE
-  ssd1331WriteCommand(0x3E);
-  ssd1331WriteCommand(SSD1331_CMD_MASTERCURRENT); // 0x87
-  ssd1331WriteCommand(0x0f);
-  ssd1331WriteCommand(SSD1331_CMD_CONTRASTA); // 0x81
-  ssd1331WriteCommand(0xFF);
-  ssd1331WriteCommand(SSD1331_CMD_CONTRASTB); // 0x82
-  ssd1331WriteCommand(0xFF);
-  ssd1331WriteCommand(SSD1331_CMD_CONTRASTC); // 0x83
-  ssd1331WriteCommand(0xFF);
-  ssd1331WriteCommand(SSD1331_CMD_DISPLAYALLOFF);
-  ssd1331WriteCommand(SSD1331_CMD_NORMALDISPLAY); // 0xA4
-  ssd1331WriteCommand(SSD1331_CMD_DISPLAYON); //--turn on oled panel
+  SSD1351WriteCommand(SSD1351_CMD_COMMANDLOCK);
+  SSD1351WriteCommand(0x12);
+  SSD1351WriteCommand(SSD1351_CMD_COMMANDLOCK);
+  SSD1351WriteCommand(0xB1);
+  SSD1351WriteCommand(SSD1351_CMD_DISPLAYOFF); // 0xAE
+  SSD1351WriteCommand(SSD1351_CMD_SETREMAP);   // 0xA0
+  if(OLED_FLIP) SSD1351WriteCommand(0x60); 
+  else SSD1351WriteCommand(0x72);
+  SSD1351WriteCommand(SSD1351_CMD_STARTLINE); // 0xA1
+  SSD1351WriteCommand(0x0);
+  SSD1351WriteCommand(SSD1351_CMD_DISPLAYOFFSET); // 0xA2
+  SSD1351WriteCommand(0x0);
+  SSD1351WriteCommand(SSD1351_CMD_NORMALDISPLAY); // 0xA4
+  SSD1351WriteCommand(SSD1351_CMD_CONTRASTABC); // 0xB1
+  SSD1351WriteCommand(0xC8);
+  SSD1351WriteCommand(0x80);
+  SSD1351WriteCommand(0xC8);
+  SSD1351WriteCommand(SSD1351_CMD_CONTRASTMASTER); // 0xB1
+  SSD1351WriteCommand(0xFF);
+  SSD1351WriteCommand(SSD1351_CMD_PRECHARGE2); // 0xB1
+  SSD1351WriteCommand(0x01);
+  SSD1351WriteCommand(SSD1351_CMD_CLOCKDIV); // 0xB3
+  SSD1351WriteCommand(0xF1);
+  SSD1351WriteCommand(SSD1351_CMD_MUXRATIO); // 0xB1
+  SSD1351WriteCommand(127);
+  SSD1351WriteCommand(SSD1351_CMD_SETVSL); // 0xB1
+  SSD1351WriteCommand(0xA0);
+  SSD1351WriteCommand(0xB5);
+  SSD1351WriteCommand(0x55);
+  SSD1351WriteCommand(SSD1351_CMD_DISPLAYALLOFF);
+  SSD1351WriteCommand(SSD1351_CMD_NORMALDISPLAY); // 0xA4
+  SSD1351WriteCommand(SSD1351_CMD_DISPLAYON); //--turn on oled panel
 
   gpio_put(DC, 0);
 
-  ssd1331WriteCommand(0x15);
-  ssd1331WriteCommand(0);
-  ssd1331WriteCommand(95);
-  ssd1331WriteCommand(0x75);
-  ssd1331WriteCommand(0);
-  ssd1331WriteCommand(63);
+  SSD1351WriteCommand(0x15);
+  SSD1351WriteCommand(0);
+  SSD1351WriteCommand(127);
+  SSD1351WriteCommand(0x75);
+  SSD1351WriteCommand(0);
+  SSD1351WriteCommand(127);
 
   gpio_put(DC, 1);
 
@@ -1478,77 +1466,77 @@ void ssd1331_init() {
   dma_tx = dma_claim_unused_channel(true);
   c = dma_channel_get_default_config(dma_tx);
   channel_config_set_transfer_data_size(&c, DMA_SIZE_8);
-  channel_config_set_dreq(&c, spi_get_index(SSD1331_SPI) ? DREQ_SPI1_TX : DREQ_SPI0_TX);
+  channel_config_set_dreq(&c, spi_get_index(SSD1351_SPI) ? DREQ_SPI1_TX : DREQ_SPI0_TX);
   dma_channel_configure(dma_tx, &c,
-                          &spi_get_hw(SSD1331_SPI)->dr, // write address
+                          &spi_get_hw(SSD1351_SPI)->dr, // write address
                           image_data_splash_girl_sat, // read address
                           sizeof(image_data_splash_girl_sat), // element count (each element is of size transfer_data_size)
                           true); // start
 
-  // spi_write_blocking(SSD1331_SPI, image_data_maplepad_logo_9664, sizeof(image_data_maplepad_logo_9664));
+  // spi_write_blocking(SSD1351_SPI, image_data_maplepad_logo_9664, sizeof(image_data_maplepad_logo_9664));
 
   // while(1){
-  //   spi_write_blocking(SSD1331_SPI, image_data_2, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_2, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_3, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_3, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_4, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_4, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_5, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_5, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_6, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_6, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_7, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_7, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_8, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_8, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_9, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_9, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_10, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_10, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_11, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_11, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_12, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_12, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_13, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_13, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_14, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_14, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_15, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_15, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_16, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_16, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_17, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_17, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_18, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_18, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_19, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_19, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_20, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_20, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_21, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_21, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_22, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_22, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_23, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_23, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_24, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_24, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_25, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_25, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_26, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_26, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_27, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_27, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_28, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_28, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_29, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_29, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_30, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_30, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_31, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_31, sizeof(icon));
   //   sleep_ms(33);
-  //   spi_write_blocking(SSD1331_SPI, image_data_32, sizeof(icon));
+  //   spi_write_blocking(SSD1351_SPI, image_data_32, sizeof(icon));
   //   sleep_ms(33);
   // }
 }

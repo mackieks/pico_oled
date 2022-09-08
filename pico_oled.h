@@ -8,5 +8,5 @@
 #include "hardware/dma.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"
-#include "ssd1331.h"
+#include "ssd1351.h"
 
