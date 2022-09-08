@@ -6,7 +6,7 @@ project(pico_oled C CXX ASM)
 
 pico_sdk_init()
 
-add_executable(pico_oled pico_oled.c ssd1351.c font.c)
+add_executable(pico_oled pico_oled.c ssd1331.c font.c)
 
 pico_enable_stdio_usb(pico_oled 1)
 
