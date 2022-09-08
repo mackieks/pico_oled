@@ -6,9 +6,9 @@ It is designed to work specficially with the Retro Lite CM4 dock, however should
 The Pi 4 will detect a specific PID sub-device and then send over a framebuffer containing the boxart of the game currently being played, as well as send information about the system operation listed below. 
 
 ## Planned Features/To-Do
-- RP2040 MCU 
-- 128x128, General 1.5inch OLED, driven by the RP2040 over SPI bus
-- 3D Printed Housing 
+- RP2040 MCU microcontroller ($1)
+- 128x128, General 1.5inch OLED, driven by the RP2040 over SPI bus ($13)
+- 3D Printed Housing with external USB cable attached
 - Potential toggle to switch between EmulationStation/pegasus scraped metadata/image locations
 - Compression of both screenshot and wheel images to 128x128 pixels handled by Raspberry Pi 4. Image data is to be sent to the RP2040 to be sent over UART/native USB (TBD)
 - Transfer 32kb images to the RP2040 (264kb) of RAM, ensuring that previous image is removed from memory when new game is launched 
