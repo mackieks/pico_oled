@@ -1,19 +1,17 @@
 # Pico OLED Docker
-The Pico OLED project's goal is to display the current running game's title box art (in the form of a screenshot + wheel) scraped from Skyscraper, as well as toggle between on screen Pi statistics with a push button for RetroPie gaming system - all on a small 128x128 OLED display driven over SPI (in full RGB565 color). 
+Pico OLED is an add-on for Raspberry Pi-based retro gaming systems. It connects over USB and displays the current game's title + box art or Raspberry Pi system statistics (selectable with a push button) on a 1.5" 128x128 color SPI OLED. 
 
-It is designed to work specficially with the Retro Lite CM4 dock, however should be compatible with EmulationStation/RetroPie/other frontend over USB by changing the location of scraped metadata/image files. 
+Pico OLED is designed specifically for the Retro Lite CM4 dock, however should be compatible with EmulationStation/RetroPie/other frontends by changing the location of scraped metadata/image files. 
 
-The Pi 4 will detect a specific PID sub-device and then send over a framebuffer containing the boxart of the game currently being played, as well as send information about the system operation listed below. 
+## Features
+- [x] RP2040 ($1)
+- [x] 1.5" 128x128 SSD1351 SPI OLED ($13)
+- [x] 3D-printed housing with external USB cable
+- [x] Multifunction pushbutton to switch between EmulationStation/pegasus scraped metadata/image locations
 
-## Planned Features/To-Do
-- RP2040 MCU microcontroller ($1)
-- 128x128, General 1.5inch OLED, driven by the RP2040 over SPI bus ($13)
-- 3D Printed Housing with external USB cable attached
-- Potential toggle to switch between EmulationStation/pegasus scraped metadata/image locations
-- Compression of both screenshot and wheel images to 128x128 pixels handled by Raspberry Pi 4. Image data is to be sent to the RP2040 to be sent over UART/native USB (TBD)
-- Transfer 32kb images to the RP2040 (264kb) of RAM, ensuring that previous image is removed from memory when new game is launched 
-- Conversion of images to RGB565 arrays to be read by the RP2040
-- Identify a way to read game current being played on the Pi 4 (from runcommand) and search for the relevant related image files to the ROM file to be compressed, converted and sent to the Pi 
-- Show ram utilization, space available on SD card, temperatures, CPU utilization and CPU temperature
-- Switch between on-screen box art and Pi 4 with a push button 
-- Entirely written in Python (Pi 4) & C (RP2040)
+## To-do
+- [ ] Detect current game using `runcommand`
+- [ ] Downscale + convert screenshot and wheel images to 128x128 RGB565 on Pi 4 (Python)
+- [ ] Detect RP2040 by Product ID (COM port?)
+- [ ] Send image bitstream and system stats to RP2040 over USB 
+- [ ] Display either system status (RAM usage, CPU load, temp, etc.) or box art on OLED (select with pusbutton)
