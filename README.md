@@ -6,7 +6,7 @@ Pico OLED is designed specifically for the Retro Lite CM4 dock, however should b
 ## Features
 - [x] RP2040 ($1)
 - [x] 1.5" 128x128 SSD1351 SPI OLED ($13)
-- [x] 3D-printed housing with external USB cable attached
+- [x] 3D-printed housing with external USB cable
 - [x] Multifunction pushbutton to switch between EmulationStation/pegasus scraped metadata/image locations
 
 ## To-do
