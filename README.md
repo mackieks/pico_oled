@@ -1,9 +1,9 @@
-## Pico OLED - EmulationStation/Pegasus Compatible Boxart Displayer 
+# Pico OLED Docker
 The Pico OLED project's goal is to display the current running game's title box art (in the form of a screenshot + wheel) scraped from Skyscraper, as well as toggle between on screen Pi statistics with a push button for RetroPie gaming system - all on a small 128x128 OLED dispaly driven over SPI (in full RGB565 color). 
 
 It is designed to work specficially with the Retro Lite CM4 dock, however should be compatible with EmulationStation/RetroPie/other frontend over USB by changing the location of scraped metadata/image files. 
 
-The Pi 4 will detect a specific PID sub-device and then send over a framebuffer containing the boxart of the game currently being played. 
+The Pi 4 will detect a specific PID sub-device and then send over a framebuffer containing the boxart of the game currently being played, as well as send information about the system operation listed below. 
 
 ## Planned Features/To-Do
 - RP2040 MCU 
