@@ -885,7 +885,7 @@ void updateSSD1331(void){
                           sizeof(oledFB), // element count (each element is of size transfer_data_size)
                           true); // start
 
-  //spi_write_blocking(SSD1331_SPI, oledFB, sizeof(oledFB));
+  // spi_write_blocking(SSD1331_SPI, oledFB, sizeof(oledFB));
 }
 
 void drawEllipse(int xc, int yc, int xr, int yr, int angle){

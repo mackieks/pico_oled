@@ -16,31 +16,24 @@ int main() {
 
   clearSSD1331();
   updateSSD1331();
+  clearSSD1331();
 
   uint8_t c = 0;
-  // uint32_t i = 0;
+  uint32_t i = 0;
 
-  // while(1){
-  //   int c = getchar_timeout_us(100);
-  //   if (c != PICO_ERROR_TIMEOUT && i < sizeof(oledFB)) 
-  //     oledFB[i++] = (c & 0xFF);
-  //   else break;
-  // }
-
-  for (uint32_t i = 0; i < sizeof(oledFB); i++) {
-            while ((c = (uint8_t) getchar_timeout_us(0)) == PICO_ERROR_TIMEOUT) {
-                busy_wait_us_32(1);
-            }
-            oledFB[i] = c;
+  while(i < sizeof(oledFB)){ 
+    int c = getchar_timeout_us(0);
+    if (c != PICO_ERROR_TIMEOUT){
+      if(i % 2)
+        oledFB[i-1] = (uint8_t) c;
+      else
+        oledFB[i+1] = (uint8_t) c;
+      i++;  
+    } 
   }
 
   updateSSD1331();
 
-  sleep_ms(8);
-
   return(1);
 
 }
-
-
-
