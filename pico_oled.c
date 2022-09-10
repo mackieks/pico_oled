@@ -6,7 +6,7 @@ int main() {
   stdio_init_all();
 
   spi_init(SSD1331_SPI, SSD1331_SPEED);
-  spi_set_format(spi0, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
+  spi_set_format(SSD1331_SPI, 8, SPI_CPOL_1, SPI_CPHA_1, SPI_MSB_FIRST);
   gpio_set_function(SCK, GPIO_FUNC_SPI);
   gpio_set_function(MOSI, GPIO_FUNC_SPI);
 
@@ -24,10 +24,7 @@ int main() {
   while(i < sizeof(oledFB)){ 
     int c = getchar_timeout_us(0);
     if (c != PICO_ERROR_TIMEOUT){
-      if(i % 2)
-        oledFB[i-1] = (uint8_t) c;
-      else
-        oledFB[i+1] = (uint8_t) c;
+      oledFB[i] = c;
       i++;  
     } 
   }
