@@ -28,24 +28,24 @@ def main():
     # img.shape[0] = height
 
     if img.shape[1] > img.shape[0]: # height smaller than width
-        r = 96.0 / img.shape[0]
-        dim = (int(img.shape[1] * r), 64)
+        r = 128.0 / img.shape[0]
+        dim = (int(img.shape[1] * r), 128)
     elif img.shape[0] > img.shape[1]: # width smaller than height
-        r = 64.0 / img.shape[1]
-        dim = (96, int(img.shape[0] * r))
+        r = 128.0 / img.shape[1]
+        dim = (128, int(img.shape[0] * r))
     else: # 1:1 aspect ratio
-        dim = (96,64)
+        dim = (128,128)
 
     img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
     img = cv2.copyMakeBorder(img, 128, 128, 128, 128, cv2.BORDER_CONSTANT,value=[0,0,0,0])
-    img = center_crop(img, (96,64))
+    img = center_crop(img, (128,128))
 
-    r = 96.0 / img2.shape[1]
-    dim = (96, int(img2.shape[0] * r))
+    r = 128.0 / img2.shape[1]
+    dim = (128, int(img2.shape[0] * r))
 
     img2 = cv2.resize(img2, dim, interpolation=cv2.INTER_AREA)
     img2 = cv2.copyMakeBorder(img2, 128, 128, 128, 128, cv2.BORDER_CONSTANT,value=[0,0,0,0])
-    img2 = center_crop(img2, (96,64))
+    img2 = center_crop(img2, (128,128))
 
     cv2.imwrite('screenshot_scaled.png', img)
     cv2.imwrite('wheel_scaled.png', img2)
