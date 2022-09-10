@@ -48,9 +48,9 @@ def center_crop(img, dim):
 
 def main():
     get_img_directories()
-    img = cv2.imread('screenshot.png', cv2.IMREAD_UNCHANGED)
+    img = cv2.imread(screenshot, cv2.IMREAD_UNCHANGED)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-    img2 = cv2.imread('wheel.png', cv2.IMREAD_UNCHANGED)
+    img2 = cv2.imread(wheel, cv2.IMREAD_UNCHANGED)
 
     # img.shape[1] = width
     # img.shape[0] = height
