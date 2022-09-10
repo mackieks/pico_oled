@@ -6,6 +6,7 @@ import os
 from PIL import Image
 from PIL import ImageDraw
 import struct
+import serial
 
 def main():
 
@@ -31,7 +32,7 @@ def main():
     try:
         binoutfile = open(sys.argv[2],"wb")
     except:
-        print ("Can't write the binary file %s" % sys.argv[3])
+        print ("Can't write the binary file %s" % sys.argv[2])
         sys.exit(0)
 
     pix = im.load()  #load pixel array
@@ -49,9 +50,16 @@ def main():
 
             else:
                 rgb = 0
-        #
 
     binoutfile.close()
+
+    ser = serial.Serial('COM3', 921600)
+
+    data = open("out.bin","rb")
+
+    ser.write(data.read())  
+
+    data.close()
 
 if __name__=="__main__":
   main()

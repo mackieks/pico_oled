@@ -18,19 +18,18 @@ int main() {
   updateSSD1331();
   clearSSD1331();
 
-  uint8_t c = 0;
-  uint32_t i = 0;
+  while(1){
+    uint8_t c = 0;
+    uint32_t i = 0;
 
-  while(i < sizeof(oledFB)){ 
-    int c = getchar_timeout_us(0);
-    if (c != PICO_ERROR_TIMEOUT){
-      oledFB[i] = c;
-      i++;  
-    } 
+    while(i < sizeof(oledFB)){ 
+      int c = getchar_timeout_us(0);
+      if (c != PICO_ERROR_TIMEOUT){
+        oledFB[i] = c;
+        i++;  
+      } 
+    }
+    updateSSD1331();
   }
-
-  updateSSD1331();
-
-  return(1);
-
+  
 }
