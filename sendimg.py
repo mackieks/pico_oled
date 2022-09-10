@@ -9,6 +9,34 @@ from PIL import ImageDraw
 import struct
 import serial
 
+def get_cpu_temp():
+    tempFile = open("/sys/class/thermal/thermal_zone0/temp")
+    cpu_temp = tempFile.read()
+    tempFile.close()
+    return float(cpu_temp)/1000
+
+def get_cpu_speed():
+    tempFile = open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
+    cpu_speed = tempFile.read()
+    tempFile.close()
+    return float(cpu_speed)/1000
+
+def get_ip_address(cmd, cmdeth):
+    ipaddr = run_cmd(cmd)
+
+    count = len(ipaddr)
+    if count == 0 :
+        ipaddr = run_cmd(cmdeth)
+    return ipaddr
+
+def get_img_directories():
+    global wheel, screenshot
+    tempFile = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
+    retropie_oled_lines = tempFile.readlines()
+    file.close()
+    wheel = retropie_oled_lines[1].rstrip('\n')
+    screenshot = retropie_oled_lines[0].rstrip('\n')
+
 def center_crop(img, dim):
     width, height = img.shape[1], img.shape[0]
     crop_width = dim[0] if dim[0]<img.shape[1] else img.shape[1]
@@ -19,7 +47,7 @@ def center_crop(img, dim):
     return crop_img
 
 def main():
-
+    get_img_directories()
     img = cv2.imread('screenshot.png', cv2.IMREAD_UNCHANGED)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
     img2 = cv2.imread('wheel.png', cv2.IMREAD_UNCHANGED)
