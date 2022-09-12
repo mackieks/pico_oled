@@ -8,6 +8,9 @@ from PIL import Image
 from PIL import ImageDraw
 import struct
 import serial
+import linecache
+import xml.etree.ElementTree as et
+import xml.sax.saxutils as saxutils
 
 def get_cpu_temp():
     tempFile = open("/sys/class/thermal/thermal_zone0/temp")
