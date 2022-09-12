@@ -8,6 +8,68 @@ from PIL import Image
 from PIL import ImageDraw
 import struct
 import serial
+import linecache
+import xml.etree.ElementTree as et
+import xml.sax.saxutils as saxutils
+
+def get_cpu_temp():
+    tempFile = open("/sys/class/thermal/thermal_zone0/temp")
+    cpu_temp = tempFile.read()
+    tempFile.close()
+    return float(cpu_temp)/1000
+
+def get_cpu_speed():
+    tempFile = open("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq")
+    cpu_speed = tempFile.read()
+    tempFile.close()
+    return float(cpu_speed)/1000
+
+def get_ip_address(cmd, cmdeth):
+    ipaddr = run_cmd(cmd)
+
+    count = len(ipaddr)
+    if count == 0 :
+        ipaddr = run_cmd(cmdeth)
+    return ipaddr
+
+def get_img_directories():
+    global wheel, screenshot
+    tempFile = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
+    retropie_oled_img_dir = tempFile.readlines()
+    file.close()
+    wheel = retropie_oled_img_dir[1].rstrip('\n')
+    screenshot = retropie_oled_img_dir[0].rstrip('\n')
+    
+def get_game_metadata():
+    tempFileA = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
+    gamemetadata = tempFileA.readlines()
+    file.close()
+    game_name = gamemetadata[0].split('/')[-1].rsplit('.',1)[0] # Get the current game name
+    system_name = gamemetadata[0].split('/')[4] # Get the current system name
+    gamelist_path = '/opt/retropie/configs/all/emulationstation/gamelists/SystemName/gamelist.xml'
+    data = et.parse(gamelist_path)
+    
+    # Find all the games with matching names within gamelist_path
+    game_list = data.findall(u".//game[name='{0}']".format(saxutils.escape(game_name)))
+    
+    for game in game_list:
+        if game.find('desc') is not None:
+            desc = str('Description is :\n' + game.find('desc').text)
+            
+        if game.find('') is not None:
+            rating = str('Rating:\n' + game.find('rating').text)
+            
+        if game.find('releasedate') is not None:
+            release_date = str ('Release Date:\n' + game.find('releasedate').text)
+            
+        if game.find('developer') is not None: 
+            developer = str ('Developer:\n' + game.find('developer').text)
+            
+        if game.find('publisher') is not None: 
+            publsiher = str ('Publisher:\n' + game.find('releasedate').text)
+            
+        if game.find('genre') is not None: 
+            genre = str ('Genre:\n' + game.find('genre').text)
 
 def center_crop(img, dim):
     width, height = img.shape[1], img.shape[0]
@@ -19,10 +81,10 @@ def center_crop(img, dim):
     return crop_img
 
 def main():
-
-    img = cv2.imread('screenshot.png', cv2.IMREAD_UNCHANGED)
+    get_img_directories()
+    img = cv2.imread(screenshot, cv2.IMREAD_UNCHANGED)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-    img2 = cv2.imread('wheel.png', cv2.IMREAD_UNCHANGED)
+    img2 = cv2.imread(wheel, cv2.IMREAD_UNCHANGED)
 
     # img.shape[1] = width
     # img.shape[0] = height
