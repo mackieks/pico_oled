@@ -14,23 +14,23 @@ int main() {
 
   sleep_ms(2500);
 
-  // clearSSD1351();
-  // updateSSD1351();
-  // clearSSD1351();
+  clearSSD1351();
+  updateSSD1351();
+  clearSSD1351();
 
-  // while(1){
-  //   uint8_t c = 0;
-  //   uint32_t i = 0;
+  while(1){
+    uint8_t c = 0;
+    uint32_t i = 0;
 
-  //   while(i < sizeof(oledFB)){ 
-  //     int c = getchar_timeout_us(0);
-  //     if (c != PICO_ERROR_TIMEOUT){
-  //       oledFB[i] = c;
-  //       i++;  
-  //     } 
-  //   }
-  //   updateSSD1351();
-  // }
+    while(i < sizeof(oledFB)){ 
+      int c = getchar_timeout_us(0);
+      if (c != PICO_ERROR_TIMEOUT){
+        oledFB[i] = c;
+        i++;  
+      } 
+    }
+    updateSSD1351();
+  }
 
   // updateSSD1351();
   
