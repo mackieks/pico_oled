@@ -44,9 +44,9 @@ def get_game_metadata():
     tempFileA = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
     gamemetadata = tempFileA.readlines()
     file.close()
-    game_name = gamemetadata[0].split('/')[-1].rsplit('.',1)[0] # Get the current game name
-    system_name = gamemetadata[0].split('/')[4] # Get the current system name
-    gamelist_path = '/opt/retropie/configs/all/emulationstation/gamelists/SystemName/gamelist.xml'
+    game_name = gamemetadata[0].split('/')[-1].rsplit('.',1)[0].split('(')[0].rstrip() # Get the current game name
+    system_name = gamemetadata[0].split('/')[5] # Get the current system name
+    gamelist_path = os.path.join('/opt/retropie/configs/all/emulationstation/gamelists', system_name, 'gamelist.xml')
     data = et.parse(gamelist_path)
     
     # Find all the games with matching names within gamelist_path
