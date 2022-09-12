@@ -9,11 +9,21 @@
 #include "font.h"
 
 #define SSD1351_SPI spi0
-#define SSD1351_SPEED  62500000  // 62.5MHz
+#define SSD1351_SPEED  10000000  // 62.5MHz
 #define SCK 2
 #define MOSI 3
+
+#define PICO 0
+#define TINY2040 1
+
+#if PICO
 #define DC 14
 #define RST 13
+
+#elif TINY2040
+#define DC 5
+#define RST 4
+#endif
 
 #define OLED_W 128
 #define OLED_H 128
@@ -62,7 +72,7 @@ void SSD1351WriteCommand(const uint8_t data);
 
 void SSD1351WriteCommands(const uint8_t* data, uint num);
 
-void SSD1351WriteData(const uint8_t* data, uint numbytes);
+void SSD1351WriteData(const uint8_t data);
 
 void setPixelSSD1351(const uint8_t x, const uint8_t y, const uint16_t color);
 
