@@ -1,21 +1,40 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 from lib2to3.pgen2 import pgen
 from operator import truediv
 from pickle import TRUE
+from serial.tools import list_ports
 import sys
 import os
-
-import cv2
-from PIL import Image
-from PIL import ImageDraw
+import subprocess
 import struct
 import serial
 import linecache
 import xml.etree.ElementTree as et
 import xml.sax.saxutils as saxutils
 
+import cv2
+from PIL import Image
+from PIL import ImageDraw
+from datetime import datetime
+
 raspi_connected = 1
+box_art_flag = 0
+
+def pico_com_port():
+    global pico_port
+    picoVID = "2E8A" # Raspberry Pi Pico USB vendor ID
+    picoPID = "000A" # Raspberry Pi Pico USB product ID
+    port_list = serial.tools.list_ports.comports()
+
+    for device in port_list:
+        if (device.vid != None or device.pid != None): 
+            if ('{:04X}'.format(device.vid) == picoVID and
+                '{:04X}'.format(device.pid) == picoPID):
+                pico_port = device.device
+                break
+            pico_port = None
+            print("Raspberry Pi Pico failed to open serial port. Please check VID and PID IDs are correct.")
 
 def get_cpu_temp():
     tempFile = open("/sys/class/thermal/thermal_zone0/temp")
@@ -38,12 +57,13 @@ def get_ip_address(cmd, cmdeth):
     return ipaddr
 
 def get_img_directories():
-    global wheel, screenshot
+    global wheel, screenshot, boxart
     tempFile = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
     retropie_oled_img_dir = tempFile.readlines()
     tempFile.close()
-    wheel = retropie_oled_img_dir[1].rstrip('\n')
     screenshot = retropie_oled_img_dir[0].rstrip('\n')
+    wheel = retropie_oled_img_dir[1].rstrip('\n')
+    boxart = retropie_oled_img_dir[2].rstrip('\n')
     
 def get_game_metadata():
     tempFile = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
@@ -92,11 +112,18 @@ def main():
         img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
         img2 = cv2.imread('wheel.png', cv2.IMREAD_UNCHANGED)
     else:
-        get_img_directories()
-        get_game_metadata()
-        img = cv2.imread(screenshot, cv2.IMREAD_UNCHANGED)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-        img2 = cv2.imread(wheel, cv2.IMREAD_UNCHANGED)
+        if box_art_flag == 0:
+            get_img_directories()
+            get_game_metadata()
+            img = cv2.imread(screenshot, cv2.IMREAD_UNCHANGED)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+            img2 = cv2.imread(wheel, cv2.IMREAD_UNCHANGED)
+        else:
+            get_img_directories()
+            get_game_metadata()
+            img = cv2.imread(boxart, cv2.IMREAD_UNCHANGED)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+            img2 = cv2.imread(boxart, cv2.IMREAD_UNCHANGED)
 
     # img.shape[1] = width
     # img.shape[0] = height
@@ -172,9 +199,11 @@ def main():
 
     binoutfile.close()
 
-    ser = serial.Serial('/dev/ttyACM1', 921600)
-
     data = open("out.bin","rb")
+
+    pico_com_port()
+
+    ser = serial.Serial(pico_port, 921600)
 
     ser.write(data.read())  
 
