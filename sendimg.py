@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+from lib2to3.pgen2 import pgen
+from operator import truediv
+from pickle import TRUE
 import sys
 import os
 
@@ -11,6 +14,8 @@ import serial
 import linecache
 import xml.etree.ElementTree as et
 import xml.sax.saxutils as saxutils
+
+raspi_connected = 1
 
 def get_cpu_temp():
     tempFile = open("/sys/class/thermal/thermal_zone0/temp")
@@ -36,14 +41,14 @@ def get_img_directories():
     global wheel, screenshot
     tempFile = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
     retropie_oled_img_dir = tempFile.readlines()
-    file.close()
+    tempFile.close()
     wheel = retropie_oled_img_dir[1].rstrip('\n')
     screenshot = retropie_oled_img_dir[0].rstrip('\n')
     
 def get_game_metadata():
-    tempFileA = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
-    gamemetadata = tempFileA.readlines()
-    file.close()
+    tempFile = open('/tmp/retropie_oled.log', 'r', -1, "utf-8")
+    gamemetadata = tempFile.readlines()
+    tempFile.close()
     game_name = gamemetadata[0].split('/')[-1].rsplit('.',1)[0].split('(')[0].rstrip() # Get the current game name
     system_name = gamemetadata[0].split('/')[5] # Get the current system name
     gamelist_path = os.path.join('/opt/retropie/configs/all/emulationstation/gamelists', system_name, 'gamelist.xml')
@@ -81,10 +86,17 @@ def center_crop(img, dim):
     return crop_img
 
 def main():
-    get_img_directories()
-    img = cv2.imread(screenshot, cv2.IMREAD_UNCHANGED)
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-    img2 = cv2.imread(wheel, cv2.IMREAD_UNCHANGED)
+    
+    if raspi_connected == 0: 
+        img = cv2.imread('screenshot.png', cv2.IMREAD_UNCHANGED)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+        img2 = cv2.imread('wheel.png', cv2.IMREAD_UNCHANGED)
+    else:
+        get_img_directories()
+        get_game_metadata()
+        img = cv2.imread(screenshot, cv2.IMREAD_UNCHANGED)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+        img2 = cv2.imread(wheel, cv2.IMREAD_UNCHANGED)
 
     # img.shape[1] = width
     # img.shape[0] = height
@@ -160,7 +172,7 @@ def main():
 
     binoutfile.close()
 
-    ser = serial.Serial('COM3', 921600)
+    ser = serial.Serial('/dev/ttyACM1', 921600)
 
     data = open("out.bin","rb")
 
