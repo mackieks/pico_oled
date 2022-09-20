@@ -18,8 +18,11 @@ from PIL import Image
 from PIL import ImageDraw
 from datetime import datetime
 
-raspi_connected = 1
-box_art_flag = 0
+# Host selection (for debugging)
+raspberryPi = 0
+pc = 1
+
+enable_boxart = 0
 
 def pico_com_port():
     global pico_port
@@ -107,29 +110,30 @@ def center_crop(img, dim):
 
 def main():
     
-    if raspi_connected == 0: 
-        img = cv2.imread('screenshot.png', cv2.IMREAD_UNCHANGED)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-        img2 = cv2.imread('wheel.png', cv2.IMREAD_UNCHANGED)
-    else:
-        if box_art_flag == 0:
-            get_img_directories()
-            get_game_metadata()
-            img = cv2.imread(screenshot, cv2.IMREAD_UNCHANGED)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-            img2 = cv2.imread(wheel, cv2.IMREAD_UNCHANGED)
-        else:
+    if raspberryPi: 
+        if enable_boxart:
             get_img_directories()
             get_game_metadata()
             img = cv2.imread(boxart, cv2.IMREAD_UNCHANGED)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
             img2 = cv2.imread(boxart, cv2.IMREAD_UNCHANGED)
+        else:   
+            get_img_directories()
+            get_game_metadata()
+            img = cv2.imread(screenshot, cv2.IMREAD_UNCHANGED)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+            img2 = cv2.imread(wheel, cv2.IMREAD_UNCHANGED)
+    elif pc: # PC mode (debug)
+        img = cv2.imread('screenshot.png', cv2.IMREAD_UNCHANGED)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
+        img2 = cv2.imread('wheel.png', cv2.IMREAD_UNCHANGED) 
+        img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGBA)
     
     # Grab bit-depth of screenshot image
-    pngchannels = img.shape[2]
-    datatype = str(img.dtype)
-    datatypeinbits = int(re.search(r'\d+', datatype).group())
-    bpp = pngchannels * datatypeinbits
+    # pngchannels = img.shape[2]
+    # datatype = str(img.dtype)
+    # datatypeinbits = int(re.search(r'\d+', datatype).group())
+    # bpp = pngchannels * datatypeinbits
 
     # img.shape[1] = width
     # img.shape[0] = height
@@ -157,8 +161,8 @@ def main():
     cv2.imwrite('screenshot_scaled.png', img)
     cv2.imwrite('wheel_scaled.png', img2)
 
-    background = Image.open('screenshot_scaled.png')
-    foreground = Image.open('wheel_scaled.png')
+    background = Image.fromarray(img)
+    foreground = Image.fromarray(img2)
 
     output = Image.alpha_composite(background, foreground).save('combined.png')
 
@@ -205,15 +209,12 @@ def main():
 
     binoutfile.close()
 
-    data = open("out.bin","rb")
-
-    pico_com_port()
-
-    ser = serial.Serial(pico_port, 921600)
-
-    ser.write(data.read())  
-
-    data.close()
+    if raspberryPi:
+        data = open("out.bin","rb")
+        pico_com_port()
+        ser = serial.Serial(pico_port, 921600)
+        ser.write(data.read())  
+        data.close()
 
 if __name__=="__main__":
   main()
