@@ -124,6 +124,12 @@ def main():
             img = cv2.imread(boxart, cv2.IMREAD_UNCHANGED)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
             img2 = cv2.imread(boxart, cv2.IMREAD_UNCHANGED)
+    
+    # Grab bit-depth of screenshot image
+    pngchannels = img.shape[2]
+    datatype = str(img.dtype)
+    datatypeinbits = int(re.search(r'\d+', datatype).group())
+    bpp = pngchannels * datatypeinbits
 
     # img.shape[1] = width
     # img.shape[0] = height
