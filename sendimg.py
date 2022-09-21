@@ -217,6 +217,11 @@ def main():
         ser = serial.Serial(pico_port, 921600)
         ser.write(data.read())  
         data.close()
+    elif pc:
+        ser = serial.Serial('COM3', 921600)
+        data = open("out.bin","rb")
+        ser.write(data.read())  
+        data.close()
 
 if __name__=="__main__":
   main()
