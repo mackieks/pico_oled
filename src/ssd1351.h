@@ -9,7 +9,7 @@
 #include "font.h"
 
 #define SSD1351_SPI spi0
-#define SSD1351_SPEED  10000000  // 62.5MHz
+#define SSD1351_SPEED  62500000  // 62.5MHz
 #define SCK 2
 #define MOSI 3
 
