@@ -26,6 +26,6 @@ title=`grep -s -w -A1 "${rom_bn}" ${GAMELIST} | awk '{getline;print}' | awk 'BEG
 title="${title%%(*}"
 rom_bn="${rom_bn%.*}"
 
-echo $HOME/RetroPie/roms/$1/media/screenshot/${rom_bn}.png" >> /tmp/retropie-oled.log
-echo $HOME/RetroPie/roms/$1/media/wheel/${rom_bn}.png" >> /tmp/retropie-oled.log
-echo system >> /tmp/retropie-oled.log
+echo "$HOME/RetroPie/roms/$1/media/screenshot/${rom_bn}.png" >> /tmp/retropie-oled.log
+echo "$HOME/RetroPie/roms/$1/media/wheel/${rom_bn}.png" >> /tmp/retropie-oled.log
+echo $1 >> /tmp/retropie-oled.log
